@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,6 +33,11 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           _makePageView(),
           _makeBottomBar(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+            child: Text(
+                'APPLICATION RUNNING ON ${kIsWeb ? 'WEB' : Platform.operatingSystem.toUpperCase()}'),
+          ),
         ],
       ),
     );
