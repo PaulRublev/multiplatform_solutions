@@ -1,9 +1,7 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../app_platform.dart';
 import 'page_content.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -36,7 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
             child: Text(
-                'APPLICATION RUNNING ON ${kIsWeb ? 'WEB' : Platform.operatingSystem.toUpperCase()}'),
+              "APPLICATION RUNNING ON "
+              "${AppPlatform.platform.toString().toUpperCase()}",
+            ),
           ),
         ],
       ),
@@ -63,37 +63,38 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _makePageView() {
     return Expanded(
-      child: SingleChildScrollView(
-        child: _textFieldValue == ''
-            ? Container()
-            : FutureBuilder<String>(
-                future: _loadingPage(_textFieldValue),
-                builder: ((context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Container();
-                    case ConnectionState.waiting:
-                      return const Padding(
-                        padding: EdgeInsets.only(
-                          top: 48.0,
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
+      child: _textFieldValue == ''
+          ? Container()
+          : FutureBuilder<String>(
+              future: _loadingPage(_textFieldValue),
+              builder: ((context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Container();
+                  case ConnectionState.waiting:
+                    return const Padding(
+                      padding: EdgeInsets.only(
+                        top: 48.0,
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  case ConnectionState.done:
+                    if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    } else if (snapshot.hasData) {
+                      return PageContent(
+                        content: snapshot.data,
+                        url: _textFieldValue,
                       );
-                    case ConnectionState.done:
-                      if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        return PageContent(content: snapshot.data);
-                      }
-                      return Container();
-                    default:
-                      return Container();
-                  }
-                }),
-              ),
-      ),
+                    }
+                    return Container();
+                  default:
+                    return Container();
+                }
+              }),
+            ),
     );
   }
 

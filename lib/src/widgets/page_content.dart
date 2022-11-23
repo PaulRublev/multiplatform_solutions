@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 
+import 'mock_webview.dart'
+    if (dart.library.io) 'non_web_platform_webview.dart'
+    if (dart.library.html) 'web_platform_webview.dart';
+
 class PageContent extends StatelessWidget {
-  const PageContent({super.key, required this.content});
+  const PageContent({super.key, required this.content, required this.url});
 
   final String? content;
+  final String url;
   final String _corsHeader = 'CORS Header:';
   final String _corsValue = 'None';
 
@@ -19,8 +24,8 @@ class PageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String data = _parseTitle(content ?? '');
-    data = data.replaceAll(RegExp('\n'), ' ').trim();
+    String title = _parseTitle(content ?? '');
+    title = title.replaceAll(RegExp('\n'), ' ').trim();
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -33,7 +38,7 @@ class PageContent extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            data,
+            title,
             textScaleFactor: 2,
           ),
           const SizedBox(height: 5),
@@ -46,7 +51,11 @@ class PageContent extends StatelessWidget {
                     color: Colors.red,
                   ),
                 ),
-          Text('$content'),
+          content == ''
+              ? Container()
+              : Expanded(
+                  child: webView(url),
+                ),
         ],
       ),
     );
